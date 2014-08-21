@@ -1,0 +1,24 @@
+08-18 16:43:51.233: D/MainActivity(25053): LIS3DH 3-axis Accelerometer, power=0.25, midDelay=0
+08-18 16:43:51.233: D/MainActivity(25053): AK8975 3-axis Magnetic field sensor, power=6.8, midDelay=0
+08-18 16:43:51.233: D/MainActivity(25053): AK8975 Orientation sensor, power=7.05, midDelay=0
+08-18 16:43:51.233: D/MainActivity(25053): CT405 Proximity sensor, power=3.0, midDelay=0
+08-18 16:43:51.233: D/MainActivity(25053): CT405 Light sensor, power=0.175, midDelay=0
+
+08-18 16:43:51.233: D/MainActivity(25053): TYPE_ACCELEROMETER TRUE!
+08-18 16:43:51.241: D/MainActivity(25053): TYPE_LIGHT TRUE!
+08-18 16:43:51.241: D/MainActivity(25053): TYPE_MAGNETIC_FIELD TRUE!
+08-18 16:43:51.241: D/MainActivity(25053): TYPE_PROXIMITY TRUE!
+
+08-18 16:43:51.233: D/MainActivity(25053): TYPE_AMBIENT_TEMPERATURE FALSE!
+08-18 16:43:51.233: D/MainActivity(25053): TYPE_GRAVITY FALSE!
+08-18 16:43:51.233: D/MainActivity(25053): TYPE_GYROSCOPE FALSE!
+08-18 16:43:51.241: D/MainActivity(25053): TYPE_LINEAR_ACCELERATION FALSE!
+08-18 16:43:51.241: D/MainActivity(25053): TYPE_PRESSURE FALSE!
+08-18 16:43:51.241: D/MainActivity(25053): TYPE_RELATIVE_HUMIDITY FALSE!
+08-18 16:43:51.241: D/MainActivity(25053): TYPE_ROTATION_VECTOR FALSE!
+
+
+
+http://developer.android.com/guide/topics/sensors/sensors_position.html
+http://developer.android.com/guide/topics/sensors/sensors_overview.html
+http://developer.android.com/guide/topics/sensors/sensors_environment.html
