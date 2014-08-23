@@ -7,33 +7,29 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="mikhail.kalashnikov.screencontroler.ShakeActivity" >
+    tools:context="mikhail.kalashnikov.screencontroller.ScreenControllerActivity" >
 
     <Button
         android:id="@+id/startService"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/btn_start_service"
-        android:onClick="startService" />
+        android:text="@string/btn_start_service" />
 
     <Button
         android:id="@+id/stopService"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/btn_stop_service" 
-        android:onClick="stopService"/>
+        android:text="@string/btn_stop_service"/>
     <Button
         android:id="@+id/lock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/btn_lock_screen" 
-        android:onClick="lockScreen"/>
+        android:text="@string/btn_lock_screen"/>
     
 	<Button
         android:id="@+id/restart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/btn_restart"
-        android:visibility="gone" 
-        android:onClick="restartPhone"/>
+        android:visibility="gone" />
 </LinearLayout>

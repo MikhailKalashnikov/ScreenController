@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="mikhail.kalashnikov.screencontroler"
+    package="mikhail.kalashnikov.screencontroller"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="mikhail.kalashnikov.screencontroler.ShakeActivity"
+            android:name=".ScreenControllerActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,11 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="mikhail.kalashnikov.screencontroler.TurnOnScreenActivity"></activity>
-        
+        <activity android:name=".TurnOnScreenActivity" android:theme="@style/Theme.Transparent"></activity>
+        <activity android:name=".SettingsActivity"></activity>
         <service android:name="WakeUpService"></service>
         <receiver 
-            android:name="mikhail.kalashnikov.screencontroler.DeviceAdminLockReceiver"
+            android:name=".DeviceAdminLockReceiver"
             android:label="@string/device_admin_label"        
             android:description="@string/device_admin_description"        
             android:permission="android.permission.BIND_DEVICE_ADMIN">
@@ -37,6 +37,15 @@
             <intent-filter >
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
             </intent-filter>
+        </receiver>
+        
+        <receiver android:name="ScreenControllerWidgetProvider">
+            <intent-filter >
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="mikhail.kalashnikov.screencontroller.LOCK_BUTTON"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info"/>
         </receiver>
     </application>
 

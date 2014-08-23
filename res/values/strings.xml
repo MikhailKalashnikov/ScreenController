@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ScreenControler</string>
+    <string name="app_name">ScreenController</string>
     <string name="action_settings">Settings</string>
     <string name="btn_start_service">Start Service</string>
     <string name="btn_stop_service">Stop Service</string>    
@@ -10,4 +10,15 @@
 	<string name="msg_restart_confirmation">Restart phone now?</string>
 	<string name="device_admin_label">ScreenControler Device Admin</string>
 	<string name="device_admin_description">ScreenControler need permission to lock phone</string>
+	<string name="pref_sensor_mode">Sensor Mode</string>
+	<string name="sensor_mode_accelerometer_only">ACCELEROMETER_ONLY</string>
+	<string name="sensor_mode_proximity_only">PROXIMITY_ONLY</string>
+	<string name="sensor_mode_accelerometer_and_proximity">ACCELEROMETER_AND_PROXIMITY</string>
+	<string-array name="pref_sensor_mode_values">
+	    <item>@string/sensor_mode_accelerometer_only</item>
+	    <item>@string/sensor_mode_proximity_only</item>
+	    <item>@string/sensor_mode_accelerometer_and_proximity</item>
+	</string-array>
+	
+	<string name="grant_admin_first">Activate admin first via main activity</string>
 </resources>
