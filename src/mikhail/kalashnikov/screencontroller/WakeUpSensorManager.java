@@ -66,29 +66,31 @@ public class WakeUpSensorManager implements SensorEventListener {
 			}
 			mMaxDistance = mProximitySensor.getMaximumRange();
 			mLastDistance = mMaxDistance;
-			mSensorManager.registerListener(this, mProximitySensor, SensorManager.SENSOR_DELAY_GAME);
-			if(DebugGuard.DEBUG) Log.d(TAG, "registerListener Proximity");
 		}
 	}
 	
-	public void start() {
-		if(DebugGuard.DEBUG) Log.d(TAG, "onStart");
+	public void startAccelerometer() {
+		if(DebugGuard.DEBUG) Log.d(TAG, "startAccelerometer");
 		isPhoneActive = false;
 		if(mSensorMode == SENSOR_MODE.ACCELEROMETER_ONLY || mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY){
 			boolean isOK = mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
 			if(DebugGuard.DEBUG) Log.d(TAG, "registerListener Accelerometer " + isOK);
 		}
 	}
+
 	
-	public void stop(boolean stopAll){
+	public void startProximity() {
+		if(DebugGuard.DEBUG) Log.d(TAG, "startProximity");
+		if(mSensorMode == SENSOR_MODE.PROXIMITY_ONLY || mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY){
+			mSensorManager.registerListener(this, mProximitySensor, SensorManager.SENSOR_DELAY_GAME);
+			if(DebugGuard.DEBUG) Log.d(TAG, "registerListener Proximity");
+		}
+	}
+
+	public void stop(){
 		isPhoneActive = true;
 		if(mSensorManager != null){
-			if(stopAll){
-				mSensorManager.unregisterListener(this);
-			}else{
-				mSensorManager.unregisterListener(this, mAccelerometerSensor);
-			}
-//			mSensorManager = null;
+			mSensorManager.unregisterListener(this);
 		}
 	}
 
@@ -131,7 +133,7 @@ public class WakeUpSensorManager implements SensorEventListener {
 		if(sensorType == Sensor.TYPE_ACCELEROMETER &&
 			(mSensorMode == SENSOR_MODE.ACCELEROMETER_ONLY || 
 				(mLastDistance == mMaxDistance && mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY))){
-			Log.d(TAG, "onSensorChanged ACCELEROMETER part");
+			//Log.d(TAG, "onSensorChanged ACCELEROMETER part");
 			long now = System.currentTimeMillis();
 			
 			if ((now - mLastForce) > SHAKE_TIMEOUT) {

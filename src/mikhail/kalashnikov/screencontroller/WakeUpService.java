@@ -21,21 +21,23 @@ public class WakeUpService extends Service implements WakeUpListener{
 	private PowerManager.WakeLock mWakeLock;
 	private ScreenOnOffBroadcastReceiver mScreenOnOffBroadcastReceiver = null;
 	private Context mContext;
+	private WakeUpService mWakeUpService = this; 
+	String mSensorName = null;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if(DebugGuard.DEBUG) Log.d(TAG, "onStartCommand");
 		mContext = getBaseContext();
-		String sensorName = null;
 		if(intent != null && intent.getExtras() != null && intent.getExtras().size()>0){
-			sensorName = intent.getExtras().getString(SENSOR_NAME);
+			mSensorName = intent.getExtras().getString(SENSOR_NAME);
 		}
-		if(sensorName == null){
+		if(mSensorName == null){
 			SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			sensorName = pref.getString(SettingsActivity.PREF_SENSOR_MODE, "ACCELEROMETER_ONLY");
+			mSensorName = pref.getString(SettingsActivity.PREF_SENSOR_MODE, "ACCELEROMETER_ONLY");
 		}
-		mWakeUpSensorManager = new WakeUpSensorManager(this, sensorName);
+		mWakeUpSensorManager = new WakeUpSensorManager(this, mSensorName);
 		mWakeUpSensorManager.setWakeUpListener(this);
+		mWakeUpSensorManager.startProximity();
 
 		mPowerManager = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
 		mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
@@ -48,7 +50,7 @@ public class WakeUpService extends Service implements WakeUpListener{
 		registerReceiver(mScreenOnOffBroadcastReceiver, screenOnOffFilter);
 		
 		if(!mPowerManager.isScreenOn()){
-			mWakeUpSensorManager.start();
+			mWakeUpSensorManager.startAccelerometer();
 		}
 		return START_STICKY;
 	}
@@ -62,14 +64,14 @@ public class WakeUpService extends Service implements WakeUpListener{
 	public void onDestroy() {
 		if(DebugGuard.DEBUG) Log.d(TAG, "onDestroy");
 		if(mWakeUpSensorManager != null){
-			mWakeUpSensorManager.stop(true);
+			mWakeUpSensorManager.stop();
 			mWakeUpSensorManager = null;
-			mWakeLock.release();
 		}
 		if(mScreenOnOffBroadcastReceiver != null){
 			unregisterReceiver(mScreenOnOffBroadcastReceiver);
 			mScreenOnOffBroadcastReceiver =null;
 		}
+		mWakeLock.release();
 		super.onDestroy();
 	}
 	
@@ -91,10 +93,12 @@ public class WakeUpService extends Service implements WakeUpListener{
 		public void onReceive(Context context, Intent intent) {
 			if(DebugGuard.DEBUG) Log.d(TAG, "ScreenOnOffBroadcastReceiver.onReceive " + intent);
 			if(intent.getAction() == Intent.ACTION_SCREEN_ON && mPowerManager.isScreenOn()){
-				mWakeUpSensorManager.stop(false);
+				// We need stop all sensors (not only Accelerometer) and then register proximity again, because otherwise Accelerometer would not work
+				mWakeUpSensorManager.stop();
+				mWakeUpSensorManager.startProximity();
 			}else if(intent.getAction() == Intent.ACTION_SCREEN_OFF){
 				//mWakeUpSensorManager.stop(false);
-				mWakeUpSensorManager.start();
+				mWakeUpSensorManager.startAccelerometer();
 			}
 		}
 		
