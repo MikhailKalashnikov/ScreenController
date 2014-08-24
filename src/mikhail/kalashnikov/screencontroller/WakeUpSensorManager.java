@@ -71,7 +71,7 @@ public class WakeUpSensorManager implements SensorEventListener {
 		}
 	}
 	
-	public void startAccelerometer() {
+	public void start() {
 		if(DebugGuard.DEBUG) Log.d(TAG, "onStart");
 		isPhoneActive = false;
 		if(mSensorMode == SENSOR_MODE.ACCELEROMETER_ONLY || mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY){
@@ -114,12 +114,18 @@ public class WakeUpSensorManager implements SensorEventListener {
 		if(sensorType == Sensor.TYPE_PROXIMITY && 
 				(mSensorMode == SENSOR_MODE.PROXIMITY_ONLY || mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY)){
 			float distance = sensorEvent.values[0];
-			if(DebugGuard.DEBUG) Log.d(TAG, "onSensorChanged PROXIMITY part distance=" + distance);			
-			boolean proximityWakeUp = mLastDistance != distance && distance == mMaxDistance; 
+			boolean proximityWakeUp = mLastDistance != distance && distance == mMaxDistance;
+			if(DebugGuard.DEBUG) Log.d(TAG, "onSensorChanged PROXIMITY part distance=" + distance + ", proximityWakeUp=" + proximityWakeUp
+					+ ", " + mSensorMode + ", " + (mWakeUpListener != null)
+					+ ", isPhoneActive= " + isPhoneActive);
 			mLastDistance = distance;
 			if(!isPhoneActive && proximityWakeUp && mSensorMode == SENSOR_MODE.PROXIMITY_ONLY && mWakeUpListener != null) { 
     			mWakeUpListener.onWakeUp(); 
+//			}else if(!isPhoneActive && proximityWakeUp && mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY){
+//				boolean isOK = mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
+//				if(DebugGuard.DEBUG) Log.d(TAG, "registerListener Accelerometer " + isOK);
 			}
+				
 		}
 
 		if(sensorType == Sensor.TYPE_ACCELEROMETER &&

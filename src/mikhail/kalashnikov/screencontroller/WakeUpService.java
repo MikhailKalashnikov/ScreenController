@@ -46,6 +46,10 @@ public class WakeUpService extends Service implements WakeUpListener{
 		screenOnOffFilter.addAction(Intent.ACTION_SCREEN_ON);
 		screenOnOffFilter.addAction(Intent.ACTION_SCREEN_OFF);
 		registerReceiver(mScreenOnOffBroadcastReceiver, screenOnOffFilter);
+		
+		if(!mPowerManager.isScreenOn()){
+			mWakeUpSensorManager.start();
+		}
 		return START_STICKY;
 	}
 	
@@ -90,7 +94,7 @@ public class WakeUpService extends Service implements WakeUpListener{
 				mWakeUpSensorManager.stop(false);
 			}else if(intent.getAction() == Intent.ACTION_SCREEN_OFF){
 				//mWakeUpSensorManager.stop(false);
-				mWakeUpSensorManager.startAccelerometer();
+				mWakeUpSensorManager.start();
 			}
 		}
 		
