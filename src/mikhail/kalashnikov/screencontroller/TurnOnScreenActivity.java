@@ -40,7 +40,7 @@ public class TurnOnScreenActivity extends Activity {
 		@Override
 		protected Void doInBackground(Void... params) {
 			try {
-				Thread.sleep(10);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 			}
 			return null;

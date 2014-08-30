@@ -11,6 +11,9 @@
 	<string name="device_admin_label">ScreenControler Device Admin</string>
 	<string name="device_admin_description">ScreenControler need permission to lock phone</string>
 	<string name="pref_sensor_mode">Sensor Mode</string>
+	<string name="pref_auto_lock">Lock based on proximity</string>
+	<string name="pref_auto_lock_on">Lock phone based on proximity</string>
+	<string name="pref_auto_lock_off">Disabled</string>
 	<string name="sensor_mode_accelerometer_only">ACCELEROMETER_ONLY</string>
 	<string name="sensor_mode_proximity_only">PROXIMITY_ONLY</string>
 	<string name="sensor_mode_accelerometer_and_proximity">ACCELEROMETER_AND_PROXIMITY</string>

@@ -33,7 +33,7 @@ public class CheckAvailbleSensorsActivity extends Activity implements SensorEven
 		}
 		
 		checkSensor(Sensor.TYPE_ACCELEROMETER,"TYPE_ACCELEROMETER");
-		checkSensor(Sensor.TYPE_AMBIENT_TEMPERATURE,"TYPE_AMBIENT_TEMPERATURE");
+//		checkSensor(Sensor.TYPE_AMBIENT_TEMPERATURE,"TYPE_AMBIENT_TEMPERATURE");
 		checkSensor(Sensor.TYPE_GRAVITY,"TYPE_GRAVITY");
 		checkSensor(Sensor.TYPE_GYROSCOPE,"TYPE_GYROSCOPE");
 		checkSensor(Sensor.TYPE_LIGHT,"TYPE_LIGHT");
@@ -41,7 +41,7 @@ public class CheckAvailbleSensorsActivity extends Activity implements SensorEven
 		checkSensor(Sensor.TYPE_MAGNETIC_FIELD,"TYPE_MAGNETIC_FIELD");
 		checkSensor(Sensor.TYPE_PRESSURE,"TYPE_PRESSURE");
 		checkSensor(Sensor.TYPE_PROXIMITY,"TYPE_PROXIMITY");
-		checkSensor(Sensor.TYPE_RELATIVE_HUMIDITY,"TYPE_RELATIVE_HUMIDITY");
+//		checkSensor(Sensor.TYPE_RELATIVE_HUMIDITY,"TYPE_RELATIVE_HUMIDITY");
 		checkSensor(Sensor.TYPE_ROTATION_VECTOR,"TYPE_ROTATION_VECTOR");
 		
 		

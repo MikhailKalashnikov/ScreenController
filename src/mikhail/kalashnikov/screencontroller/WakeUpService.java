@@ -1,9 +1,11 @@
 package mikhail.kalashnikov.screencontroller;
 
-import mikhail.kalashnikov.screencontroller.WakeUpSensorManager.WakeUpListener;
-
+import mikhail.kalashnikov.screencontroller.WakeUpSensorManager.ScreenContollListener;
 import android.app.Service;
+import android.app.admin.DeviceAdminInfo;
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,30 +15,38 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class WakeUpService extends Service implements WakeUpListener{
+public class WakeUpService extends Service implements ScreenContollListener{
 	private final String TAG = getClass().getSimpleName();
 	public final static String SENSOR_NAME = "SENSOR_NAME";
+	public final static String IS_AUTO_LOCK = "IS_AUTO_LOCK";
 	private WakeUpSensorManager mWakeUpSensorManager=null;
 	private PowerManager mPowerManager;
 	private PowerManager.WakeLock mWakeLock;
 	private ScreenOnOffBroadcastReceiver mScreenOnOffBroadcastReceiver = null;
 	private Context mContext;
-	private WakeUpService mWakeUpService = this; 
-	String mSensorName = null;
+	private String mSensorName = null;
+	private boolean mPrefAutoLock;
+	private DevicePolicyManager mDevicePolicyManager;
+	private ComponentName mDeviceAdmin;
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if(DebugGuard.DEBUG) Log.d(TAG, "onStartCommand");
 		mContext = getBaseContext();
+		mDevicePolicyManager = (DevicePolicyManager) getApplicationContext().getSystemService(DEVICE_POLICY_SERVICE);
+		mDeviceAdmin = new ComponentName(this, DeviceAdminLockReceiver.class);
+		
 		if(intent != null && intent.getExtras() != null && intent.getExtras().size()>0){
 			mSensorName = intent.getExtras().getString(SENSOR_NAME);
+			mPrefAutoLock = intent.getExtras().getBoolean(IS_AUTO_LOCK);
 		}
 		if(mSensorName == null){
 			SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 			mSensorName = pref.getString(SettingsActivity.PREF_SENSOR_MODE, "ACCELEROMETER_ONLY");
+			mPrefAutoLock = pref.getBoolean(SettingsActivity.PREF_AUTO_LOCK, false);
 		}
-		mWakeUpSensorManager = new WakeUpSensorManager(this, mSensorName);
-		mWakeUpSensorManager.setWakeUpListener(this);
+		mWakeUpSensorManager = new WakeUpSensorManager(this, mSensorName, mPrefAutoLock);
+		mWakeUpSensorManager.setScreenContollListener(this);
 		mWakeUpSensorManager.startProximity();
 
 		mPowerManager = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
@@ -102,6 +112,17 @@ public class WakeUpService extends Service implements WakeUpListener{
 			}
 		}
 		
+	}
+
+
+	@Override
+	public void onLock() {
+		if(DebugGuard.DEBUG) Log.d(TAG, "onLock");
+
+		if(mDevicePolicyManager.isAdminActive(mDeviceAdmin)){
+			mDevicePolicyManager.lockNow();
+			mDevicePolicyManager.setMaximumTimeToLock(mDeviceAdmin, 0);
+		}
 	}
 
 }

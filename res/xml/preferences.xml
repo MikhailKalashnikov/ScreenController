@@ -8,4 +8,9 @@
 	    android:entries="@array/pref_sensor_mode_values"
 	    android:entryValues="@array/pref_sensor_mode_values"/>    
 
+	<CheckBoxPreference
+	    android:key="pref_auto_lock"
+	    android:title="@string/pref_auto_lock" 
+	    android:summaryOff="@string/pref_auto_lock_off" 
+	    android:summaryOn="@string/pref_auto_lock_on"/>
 </PreferenceScreen>

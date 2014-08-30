@@ -8,7 +8,8 @@ import android.preference.PreferenceActivity;
 
 public class SettingsActivity extends PreferenceActivity
 	implements OnSharedPreferenceChangeListener{
-	public final static String PREF_SENSOR_MODE = "pref_sensor_mode"; 
+	public final static String PREF_SENSOR_MODE = "pref_sensor_mode";
+	public final static String PREF_AUTO_LOCK = "pref_auto_lock";
 	
 	@SuppressWarnings("deprecation")
 	@Override

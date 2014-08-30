@@ -25,6 +25,7 @@ public class ScreenControllerActivity extends Activity implements OnSharedPrefer
 	private DevicePolicyManager mDevicePolicyManager;
 	private SharedPreferences mPref;
 	private String mSensorMode;
+	private boolean mPrefAutoLock;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class ScreenControllerActivity extends Activity implements OnSharedPrefer
 		mPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		mPref.registerOnSharedPreferenceChangeListener(this);
 		mSensorMode = mPref.getString(SettingsActivity.PREF_SENSOR_MODE, getResources().getString(R.string.sensor_mode_accelerometer_only));
+		mPrefAutoLock = mPref.getBoolean(SettingsActivity.PREF_AUTO_LOCK, false);
 		(findViewById(R.id.lock)).setOnClickListener(this);
 		(findViewById(R.id.restart)).setOnClickListener(this);
 		(findViewById(R.id.startService)).setOnClickListener(this);
@@ -44,6 +46,7 @@ public class ScreenControllerActivity extends Activity implements OnSharedPrefer
 	public void startWakeUpService(){
 		Intent i = new Intent(this, WakeUpService.class);
 		i.putExtra(WakeUpService.SENSOR_NAME, mSensorMode);
+		i.putExtra(WakeUpService.IS_AUTO_LOCK, mPrefAutoLock);
 		startService(i);
 	}
 	
@@ -110,6 +113,12 @@ public class ScreenControllerActivity extends Activity implements OnSharedPrefer
 			if(serviceWasActive){
 				startWakeUpService();
 			}
+		}else if(key.equals(SettingsActivity.PREF_AUTO_LOCK)){
+			mPrefAutoLock = mPref.getBoolean(SettingsActivity.PREF_AUTO_LOCK, false);
+			boolean serviceWasActive = stopWakeUpService();
+			if(serviceWasActive){
+				startWakeUpService();
+			}
 		}
 	}
 
@@ -118,6 +127,7 @@ public class ScreenControllerActivity extends Activity implements OnSharedPrefer
 		if(mPref !=null){
 			Editor editor = mPref.edit();
 			editor.putString(SettingsActivity.PREF_SENSOR_MODE, mSensorMode);
+			editor.putBoolean(SettingsActivity.PREF_AUTO_LOCK, mPrefAutoLock);
 			editor.apply();
 		}
 		super.onPause();

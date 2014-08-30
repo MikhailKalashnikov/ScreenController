@@ -52,12 +52,15 @@ public final class R {
         public static final int btn_stop_service=0x7f060003;
         public static final int device_admin_description=0x7f060008;
         public static final int device_admin_label=0x7f060007;
-        public static final int grant_admin_first=0x7f06000d;
+        public static final int grant_admin_first=0x7f060010;
         public static final int msg_restart_confirmation=0x7f060006;
+        public static final int pref_auto_lock=0x7f06000a;
+        public static final int pref_auto_lock_off=0x7f06000c;
+        public static final int pref_auto_lock_on=0x7f06000b;
         public static final int pref_sensor_mode=0x7f060009;
-        public static final int sensor_mode_accelerometer_and_proximity=0x7f06000c;
-        public static final int sensor_mode_accelerometer_only=0x7f06000a;
-        public static final int sensor_mode_proximity_only=0x7f06000b;
+        public static final int sensor_mode_accelerometer_and_proximity=0x7f06000f;
+        public static final int sensor_mode_accelerometer_only=0x7f06000d;
+        public static final int sensor_mode_proximity_only=0x7f06000e;
     }
     public static final class style {
         /** 

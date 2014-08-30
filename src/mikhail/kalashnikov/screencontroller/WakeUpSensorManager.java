@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.util.Log;
 
 public class WakeUpSensorManager implements SensorEventListener {
@@ -19,9 +20,10 @@ public class WakeUpSensorManager implements SensorEventListener {
 	private static final int SHAKE_TIMEOUT = 500;
 	private static final int SHAKE_DURATION = 1000;
 	private static final int SHAKE_COUNT = 3;
+	private static final boolean START_ACCELEROMTER_WHEN_PROXIMITY_FAR = true;
 	
 	private Context mContext;
-	private WakeUpListener mWakeUpListener;
+	private ScreenContollListener mScreenContollListener;
 	private SensorManager mSensorManager;
 	
 	private int mShakeCount = 0;
@@ -35,18 +37,21 @@ public class WakeUpSensorManager implements SensorEventListener {
 	private SENSOR_MODE mSensorMode = SENSOR_MODE.ACCELEROMETER_ONLY;
 	private Sensor mAccelerometerSensor;
 	private Sensor mProximitySensor;
-	private boolean isPhoneActive=true;
+	private boolean mIsPhoneActive=false;
+	private boolean mAutoLock=true;
 	
-	public interface WakeUpListener{
+	public interface ScreenContollListener{
 		public void onWakeUp();
+		public void onLock();
 	}
 	
-	public WakeUpSensorManager(Context context, String sensorMode){
+	public WakeUpSensorManager(Context context, String sensorMode, boolean isAutoLock){
 		mContext = context;
 		mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
 		if (mSensorManager == null) {
 			throw new UnsupportedOperationException("Sensors not supported");
 		}
+		mAutoLock = isAutoLock;
 		mSensorMode = sensorMode.equals("ACCELEROMETER_ONLY")? SENSOR_MODE.ACCELEROMETER_ONLY
 						:sensorMode.equals("PROXIMITY_ONLY")? SENSOR_MODE.PROXIMITY_ONLY:
 							SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY;
@@ -71,8 +76,10 @@ public class WakeUpSensorManager implements SensorEventListener {
 	
 	public void startAccelerometer() {
 		if(DebugGuard.DEBUG) Log.d(TAG, "startAccelerometer");
-		isPhoneActive = false;
-		if(mSensorMode == SENSOR_MODE.ACCELEROMETER_ONLY || mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY){
+		mIsPhoneActive = false;
+		if(mSensorMode == SENSOR_MODE.ACCELEROMETER_ONLY || 
+				(mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY
+						&& (!START_ACCELEROMTER_WHEN_PROXIMITY_FAR || mLastDistance == mMaxDistance))){
 			boolean isOK = mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
 			if(DebugGuard.DEBUG) Log.d(TAG, "registerListener Accelerometer " + isOK);
 		}
@@ -88,14 +95,14 @@ public class WakeUpSensorManager implements SensorEventListener {
 	}
 
 	public void stop(){
-		isPhoneActive = true;
+		mIsPhoneActive = true;
 		if(mSensorManager != null){
 			mSensorManager.unregisterListener(this);
 		}
 	}
 
-	public void setWakeUpListener(WakeUpListener listener){
-		mWakeUpListener = listener;
+	public void setScreenContollListener(ScreenContollListener listener){
+		mScreenContollListener = listener;
 	}
 	
 	
@@ -117,15 +124,22 @@ public class WakeUpSensorManager implements SensorEventListener {
 				(mSensorMode == SENSOR_MODE.PROXIMITY_ONLY || mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY)){
 			float distance = sensorEvent.values[0];
 			boolean proximityWakeUp = mLastDistance != distance && distance == mMaxDistance;
+			boolean proximityLock = mAutoLock && mLastDistance != distance && distance != mMaxDistance; 
 			if(DebugGuard.DEBUG) Log.d(TAG, "onSensorChanged PROXIMITY part distance=" + distance + ", proximityWakeUp=" + proximityWakeUp
-					+ ", " + mSensorMode + ", " + (mWakeUpListener != null)
-					+ ", isPhoneActive= " + isPhoneActive);
+					+ ", " + mSensorMode + ", " + (mScreenContollListener != null)
+					+ ", isPhoneActive= " + mIsPhoneActive
+					+ ", proximityLock= " + proximityLock);
 			mLastDistance = distance;
-			if(!isPhoneActive && proximityWakeUp && mSensorMode == SENSOR_MODE.PROXIMITY_ONLY && mWakeUpListener != null) { 
-    			mWakeUpListener.onWakeUp(); 
-//			}else if(!isPhoneActive && proximityWakeUp && mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY){
-//				boolean isOK = mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
-//				if(DebugGuard.DEBUG) Log.d(TAG, "registerListener Accelerometer " + isOK);
+			if(!mIsPhoneActive && proximityWakeUp && mSensorMode == SENSOR_MODE.PROXIMITY_ONLY && mScreenContollListener != null) { 
+    			mScreenContollListener.onWakeUp(); 
+			
+			}else if(START_ACCELEROMTER_WHEN_PROXIMITY_FAR && !mIsPhoneActive && proximityWakeUp && mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY){
+				boolean isOK = mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_GAME);
+				if(DebugGuard.DEBUG) Log.d(TAG, "registerListener Accelerometer " + isOK);
+				
+			}else if(proximityLock &&(mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY || mSensorMode == SENSOR_MODE.PROXIMITY_ONLY)){
+				ProximityLockTask plt = new ProximityLockTask();
+				plt.execute();
 			}
 				
 		}
@@ -146,8 +160,8 @@ public class WakeUpSensorManager implements SensorEventListener {
 			    	if ((++mShakeCount >= SHAKE_COUNT) && (now - mLastShake > SHAKE_DURATION)) {
 			    		mLastShake = now;
 			    		mShakeCount = 0;
-			    		if (mWakeUpListener != null) { 
-			    			mWakeUpListener.onWakeUp(); 
+			    		if (mScreenContollListener != null) { 
+			    			mScreenContollListener.onWakeUp(); 
 			    		}
 			        }
 			    	mLastForce = now;
@@ -160,4 +174,22 @@ public class WakeUpSensorManager implements SensorEventListener {
 		}		
 	}
 
+	class ProximityLockTask extends AsyncTask<Void, Void, Void>{
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {}
+			
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Void result) {
+			if(mLastDistance != mMaxDistance && mScreenContollListener != null){
+				mScreenContollListener.onLock();
+			}
+		}
+	}
 }
