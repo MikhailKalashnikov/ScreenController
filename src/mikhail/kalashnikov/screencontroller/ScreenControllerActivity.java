@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -78,6 +79,8 @@ public class ScreenControllerActivity extends Activity implements OnSharedPrefer
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					Log.d(TAG, "Restart");
+					PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+					pm.reboot("test");
 					
 				}
 			});
