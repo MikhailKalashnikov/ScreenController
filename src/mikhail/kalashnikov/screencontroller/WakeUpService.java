@@ -2,7 +2,6 @@ package mikhail.kalashnikov.screencontroller;
 
 import mikhail.kalashnikov.screencontroller.WakeUpSensorManager.ScreenContollListener;
 import android.app.Service;
-import android.app.admin.DeviceAdminInfo;
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -19,13 +18,15 @@ public class WakeUpService extends Service implements ScreenContollListener{
 	private final String TAG = getClass().getSimpleName();
 	public final static String SENSOR_NAME = "SENSOR_NAME";
 	public final static String IS_AUTO_LOCK = "IS_AUTO_LOCK";
+	public final static String IS_WAKE_UP_ENABLED = "IS_WAKE_UP_ENABLED";
 	private WakeUpSensorManager mWakeUpSensorManager=null;
 	private PowerManager mPowerManager;
-	private PowerManager.WakeLock mWakeLock;
+	private PowerManager.WakeLock mWakeLock=null;
 	private ScreenOnOffBroadcastReceiver mScreenOnOffBroadcastReceiver = null;
 	private Context mContext;
 	private String mSensorName = null;
 	private boolean mPrefAutoLock;
+	private boolean mPrefWakeUpEnabled;
 	private DevicePolicyManager mDevicePolicyManager;
 	private ComponentName mDeviceAdmin;
 	
@@ -39,19 +40,27 @@ public class WakeUpService extends Service implements ScreenContollListener{
 		if(intent != null && intent.getExtras() != null && intent.getExtras().size()>0){
 			mSensorName = intent.getExtras().getString(SENSOR_NAME);
 			mPrefAutoLock = intent.getExtras().getBoolean(IS_AUTO_LOCK);
+			mPrefWakeUpEnabled = intent.getExtras().getBoolean(IS_WAKE_UP_ENABLED);
 		}
 		if(mSensorName == null){
 			SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-			mSensorName = pref.getString(SettingsActivity.PREF_SENSOR_MODE, "ACCELEROMETER_ONLY");
+			mSensorName = pref.getString(SettingsActivity.PREF_SENSOR_MODE, WakeUpSensorManager.SENSOR_MODE_PROXIMITY_ONLY);
 			mPrefAutoLock = pref.getBoolean(SettingsActivity.PREF_AUTO_LOCK, false);
+			mPrefWakeUpEnabled = pref.getBoolean(SettingsActivity.PREF_WAKE_UP, false);
 		}
+		if(mPrefWakeUpEnabled && mPrefAutoLock){
+			stopSelf();
+		}
+		
 		mWakeUpSensorManager = new WakeUpSensorManager(this, mSensorName, mPrefAutoLock);
 		mWakeUpSensorManager.setScreenContollListener(this);
 		mWakeUpSensorManager.startProximity();
 
 		mPowerManager = (PowerManager)getApplicationContext().getSystemService(Context.POWER_SERVICE);
-		mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-		mWakeLock.acquire();
+		if(mPrefWakeUpEnabled){
+			mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+			mWakeLock.acquire();
+		}
 		
 		mScreenOnOffBroadcastReceiver = new ScreenOnOffBroadcastReceiver();
 		IntentFilter screenOnOffFilter = new IntentFilter();
@@ -81,14 +90,16 @@ public class WakeUpService extends Service implements ScreenContollListener{
 			unregisterReceiver(mScreenOnOffBroadcastReceiver);
 			mScreenOnOffBroadcastReceiver =null;
 		}
-		mWakeLock.release();
+		if(mWakeLock!=null){
+			mWakeLock.release();
+		}
 		super.onDestroy();
 	}
 	
 	@Override
 	public void onWakeUp() {
 		if(DebugGuard.DEBUG) Log.d(TAG, "onWakeUp");
-		if(!mPowerManager.isScreenOn()){
+		if(mPrefWakeUpEnabled && !mPowerManager.isScreenOn()){
 			if(DebugGuard.DEBUG) Log.d(TAG, "Wake up!");
 			Intent intent = new Intent(mContext, TurnOnScreenActivity.class);   
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);  
@@ -107,8 +118,13 @@ public class WakeUpService extends Service implements ScreenContollListener{
 				mWakeUpSensorManager.stop();
 				mWakeUpSensorManager.startProximity();
 			}else if(intent.getAction() == Intent.ACTION_SCREEN_OFF){
-				//mWakeUpSensorManager.stop(false);
-				mWakeUpSensorManager.startAccelerometer();
+				
+				if(!mPrefWakeUpEnabled){
+					mWakeUpSensorManager.stop();
+				}else{
+					//mWakeUpSensorManager.stop(false);
+					mWakeUpSensorManager.startAccelerometer();
+				}
 			}
 		}
 		

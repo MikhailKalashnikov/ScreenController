@@ -6,6 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class WakeUpSensorManager implements SensorEventListener {
@@ -15,6 +16,10 @@ public class WakeUpSensorManager implements SensorEventListener {
 		PROXIMITY_ONLY,
 		ACCELEROMETER_AND_PROXIMITY
 	}
+	public static final String SENSOR_MODE_ACCELEROMETER_ONLY = "ACCELEROMETER_ONLY";
+	public static final String SENSOR_MODE_PROXIMITY_ONLY = "PROXIMITY_ONLY";
+	public static final String SENSOR_MODE_ACCELEROMETER_AND_PROXIMITY = "ACCELEROMETER_AND_PROXIMITY";
+	
 	private static final int FORCE_THRESHOLD = 1000;
 	private static final int TIME_THRESHOLD = 100;
 	private static final int SHAKE_TIMEOUT = 500;
@@ -39,6 +44,7 @@ public class WakeUpSensorManager implements SensorEventListener {
 	private Sensor mProximitySensor;
 	private boolean mIsPhoneActive=false;
 	private boolean mAutoLock=true;
+	private TelephonyManager mTelephonyManager;
 	
 	public interface ScreenContollListener{
 		public void onWakeUp();
@@ -48,12 +54,13 @@ public class WakeUpSensorManager implements SensorEventListener {
 	public WakeUpSensorManager(Context context, String sensorMode, boolean isAutoLock){
 		mContext = context;
 		mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+		mTelephonyManager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
 		if (mSensorManager == null) {
 			throw new UnsupportedOperationException("Sensors not supported");
 		}
 		mAutoLock = isAutoLock;
-		mSensorMode = sensorMode.equals("ACCELEROMETER_ONLY")? SENSOR_MODE.ACCELEROMETER_ONLY
-						:sensorMode.equals("PROXIMITY_ONLY")? SENSOR_MODE.PROXIMITY_ONLY:
+		mSensorMode = sensorMode.equals(SENSOR_MODE_ACCELEROMETER_ONLY)? SENSOR_MODE.ACCELEROMETER_ONLY
+						:sensorMode.equals(SENSOR_MODE_PROXIMITY_ONLY)? SENSOR_MODE.PROXIMITY_ONLY:
 							SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY;
 		//resume();
 		
@@ -138,8 +145,10 @@ public class WakeUpSensorManager implements SensorEventListener {
 				if(DebugGuard.DEBUG) Log.d(TAG, "registerListener Accelerometer " + isOK);
 				
 			}else if(proximityLock &&(mSensorMode == SENSOR_MODE.ACCELEROMETER_AND_PROXIMITY || mSensorMode == SENSOR_MODE.PROXIMITY_ONLY)){
-				ProximityLockTask plt = new ProximityLockTask();
-				plt.execute();
+				if(mTelephonyManager.getCallState() == TelephonyManager.CALL_STATE_IDLE){ // check that there is not active call before locking screen
+					ProximityLockTask plt = new ProximityLockTask();
+					plt.execute();
+				}
 			}
 				
 		}

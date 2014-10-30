@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <CheckBoxPreference
+	    android:key="pref_wake_up"
+	    android:title="@string/pref_wake_up" 
+	    android:summaryOff="@string/pref_wake_up_off" 
+	    android:summaryOn="@string/pref_wake_up_on"/>
+    
 	<ListPreference 
 	    android:key="pref_sensor_mode"
 	    android:title="@string/pref_sensor_mode"
 	    android:dialogTitle="@string/pref_sensor_mode"
-	    android:defaultValue="@string/sensor_mode_accelerometer_only"
+	    android:defaultValue="@string/sensor_mode_proximity_only"
 	    android:entries="@array/pref_sensor_mode_values"
-	    android:entryValues="@array/pref_sensor_mode_values"/>    
+	    android:entryValues="@array/pref_sensor_mode_values"
+	    android:dependency="pref_wake_up"/>    
 
 	<CheckBoxPreference
 	    android:key="pref_auto_lock"

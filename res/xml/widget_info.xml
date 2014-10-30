@@ -3,6 +3,7 @@
     android:minWidth="40dp"
     android:minHeight="40dp"
     android:updatePeriodMillis="0"
+    android:configure="mikhail.kalashnikov.screencontroller.WidgetConfigure"
     android:initialLayout="@layout/lock_widget">
    
 

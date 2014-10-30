@@ -31,5 +31,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/btn_restart"
-        android:visibility="visible" />
+        android:visibility="gone" />
 </LinearLayout>

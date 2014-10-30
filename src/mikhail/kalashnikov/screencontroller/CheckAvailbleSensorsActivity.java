@@ -17,8 +17,6 @@ import android.view.MenuItem;
 public class CheckAvailbleSensorsActivity extends Activity implements SensorEventListener {
 	private final String TAG = getClass().getSimpleName();
 	private SensorManager mSensorManager;
-	private Sensor mLightSensor;
-	private Sensor mAccelerometerSensor;
 	private Sensor mProximitySensor;
 	
 	@Override

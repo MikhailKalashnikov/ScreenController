@@ -14,12 +14,15 @@
 	<string name="pref_auto_lock">Lock based on proximity</string>
 	<string name="pref_auto_lock_on">Lock phone based on proximity</string>
 	<string name="pref_auto_lock_off">Disabled</string>
+	<string name="pref_wake_up">Turn Screen ON</string>
+	<string name="pref_wake_up_on">Turn screen on automatically</string>
+	<string name="pref_wake_up_off">Disabled</string>
 	<string name="sensor_mode_accelerometer_only">ACCELEROMETER_ONLY</string>
 	<string name="sensor_mode_proximity_only">PROXIMITY_ONLY</string>
 	<string name="sensor_mode_accelerometer_and_proximity">ACCELEROMETER_AND_PROXIMITY</string>
 	<string-array name="pref_sensor_mode_values">
-	    <item>@string/sensor_mode_accelerometer_only</item>
 	    <item>@string/sensor_mode_proximity_only</item>
+		<item>@string/sensor_mode_accelerometer_only</item>
 	    <item>@string/sensor_mode_accelerometer_and_proximity</item>
 	</string-array>
 	

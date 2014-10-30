@@ -36,7 +36,7 @@ public class ScreenControllerActivity extends Activity implements OnSharedPrefer
 		mDevicePolicyManager = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
 		mPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		mPref.registerOnSharedPreferenceChangeListener(this);
-		mSensorMode = mPref.getString(SettingsActivity.PREF_SENSOR_MODE, getResources().getString(R.string.sensor_mode_accelerometer_only));
+		mSensorMode = mPref.getString(SettingsActivity.PREF_SENSOR_MODE, WakeUpSensorManager.SENSOR_MODE_PROXIMITY_ONLY);
 		mPrefAutoLock = mPref.getBoolean(SettingsActivity.PREF_AUTO_LOCK, false);
 		(findViewById(R.id.lock)).setOnClickListener(this);
 		(findViewById(R.id.restart)).setOnClickListener(this);
@@ -111,7 +111,7 @@ public class ScreenControllerActivity extends Activity implements OnSharedPrefer
 			String key) {
 
 		if(key.equals(SettingsActivity.PREF_SENSOR_MODE)){
-			mSensorMode = mPref.getString(SettingsActivity.PREF_SENSOR_MODE, getResources().getString(R.string.sensor_mode_accelerometer_only));
+			mSensorMode = mPref.getString(SettingsActivity.PREF_SENSOR_MODE, WakeUpSensorManager.SENSOR_MODE_PROXIMITY_ONLY);
 			boolean serviceWasActive = stopWakeUpService();
 			if(serviceWasActive){
 				startWakeUpService();
