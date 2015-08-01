@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_btn_lock"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/widget_margin" 
+    android:src="@drawable/ic_launcher"
+    android:contentDescription="@string/btn_lock_screen">
+    
+
+</ImageButton>
